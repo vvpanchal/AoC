@@ -1,7 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class AoC2024_2Dec {
     public static void main(String[] args) {
@@ -64,8 +66,10 @@ public class AoC2024_2Dec {
 
     public static boolean isSafeBarOneLevel (String [] arr) {
         if (isSafe(arr)) return true;
-        for (int i = 0; i < arr.length - 1; i++){
-            ArrayList <String> workingAL = makeAL(arr);
+        
+        for (int i = 0; i < arr.length; i++){
+            //List <String> workingAL = Arrays.asList(arr);
+            ArrayList <String> workingAL = makeAL (arr);
             workingAL.remove(i);
             if (isSafe(workingAL.toArray())) return true;
         }
