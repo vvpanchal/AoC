@@ -5,9 +5,12 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class AoC2024_18Dec {
 
@@ -17,6 +20,7 @@ public class AoC2024_18Dec {
     public static void main(String[] args) {
         
         char [] [] grid = new char[71][71];
+        Point [] points = new Point[4000];
     
         for (int i = 0; i < 71; i++){
             for (int j = 0; j < 71 ; j++){
@@ -40,20 +44,42 @@ public class AoC2024_18Dec {
                 grid [Integer.parseInt(charArray[0])][Integer.parseInt(charArray[1])] = '#';
                 num++;
             }
+
+            
+            /* int z = 0;
+            while (myReader.hasNextLine() ) {
+                String str = myReader.nextLine();
+                String [] charArray = str.split(",");
+                points[z] = new Point (Integer.parseInt(charArray[0]), Integer.parseInt(charArray[1]) );
+                z++;
+            } */
             
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+
+        /* List path = new LinkedList<>();
+        System.out.println(path.size()-1);
+        int n = 0;
+
+        for (int i = 0; i < points.length; i++){
+            
+            if (path.contains(points[i])) break;
+            n++;
+        } */
+
+        //System.out.println(points[n].getX() +"," + points[n].getY());
         //System.out.println(res);
         //print (grid);
-        solve (grid);
+        //solve (grid);
         
         
-        //int [] [] visited = new int [71][71];
-        //walk(grid, visited, 0, 0, 0);
-        //System.out.println(noOfSteps);
+        int [] [] visited = new int [71][71];
+        walk(grid, visited, 0, 0, 0);
+        System.out.println(noOfSteps);
+        System.out.println(findShortestPath(grid).size());
 
     }
 
@@ -74,8 +100,6 @@ public class AoC2024_18Dec {
             System.out.println("");
         }
     }
-
-    
 
     public static void solve (char[][]grid){
         //int steps = 0;
@@ -136,10 +160,70 @@ public class AoC2024_18Dec {
         walk (grid, visited, x-1, y, steps+1);
         walk (grid, visited, x, y+1, steps+1);
         walk (grid, visited, x, y-1, steps+1);
-        visited[x][y] = 0; //reset current pos to not visited after walks are initiated
+        //visited[x][y] = 0; //reset current pos to not visited after walks are initiated
 
     }
 
-    
+    private static List<Point> findShortestPath(char[][] memory) {
+        Point start = new Point(0, 0);
+        Point end = new Point(70, 70);
+        boolean[][] visited = new boolean[71][71];
+        Map<Point, Point> parentMap = new HashMap<>();
+        Queue<Point> queue = new LinkedList<>();
+        queue.add(start);
+        visited[start.getY()][start.getX()] = true;
+
+        while (!queue.isEmpty()) {
+            Point current = queue.poll();
+            if (current.equals(end)) {
+                List<Point> path = new LinkedList<>();
+                for (Point at = end; at != null; at = parentMap.get(at)) {
+                    path.add(at);
+                }
+                return path;
+            }
+            
+            
+
+            if (current.getY() - 1 >= 0){
+                Point newPointUp = new Point(current.getX(), current.getY()-1);
+                if (!visited[newPointUp.getY()][newPointUp.getX()] && memory[newPointUp.getY()][newPointUp.getX()] != '#') {
+                    queue.add(newPointUp);
+                    visited[newPointUp.getY()][newPointUp.getX()] = true;
+                    parentMap.put(newPointUp, current);
+                }
+            }
+
+            if (current.getY() + 1 <= 70){
+                Point newPointDown = new Point(current.getX(), current.getY()+1);
+                if (!visited[newPointDown.getY()][newPointDown.getX()] && memory[newPointDown.getY()][newPointDown.getX()] != '#') {
+                    queue.add(newPointDown);
+                    visited[newPointDown.getY()][newPointDown.getX()] = true;
+                    parentMap.put(newPointDown, current);
+                }
+            }
+
+            if (current.getX() - 1 >= 0){
+                Point newPointLeft = new Point(current.getX()-1, current.getY());
+                if (!visited[newPointLeft.getY()][newPointLeft.getX()] && memory[newPointLeft.getY()][newPointLeft.getX()] != '#') {
+                    queue.add(newPointLeft);
+                    visited[newPointLeft.getY()][newPointLeft.getX()] = true;
+                    parentMap.put(newPointLeft, current);
+                }
+            }
+
+            if (current.getX() + 1 <= 70){
+                Point newPointRight = new Point(current.getX()+1, current.getY());
+                if (!visited[newPointRight.getY()][newPointRight.getX()] && memory[newPointRight.getY()][newPointRight.getX()] != '#') {
+                    queue.add(newPointRight);
+                    visited[newPointRight.getY()][newPointRight.getX()] = true;
+                    parentMap.put(newPointRight, current);
+                }
+            }
+        
+        }
+
+        return Collections.emptyList(); // Return an empty list if there is no path
+    }
 
 }
